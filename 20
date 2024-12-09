@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blackjack Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #2e2e2e;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .game-container {
+            text-align: center;
+        }
+        .cards {
+            margin: 20px 0;
+        }
+        .button {
+            background-color: #4CAF50;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Blackjack</h1>
+        <div class="cards">
+            <div id="playerCards">Player: </div>
+            <div id="dealerCards">Dealer: </div>
+        </div>
+        <p id="message">Your turn!</p>
+        <button class="button" id="hitButton">Hit</button>
+        <button class="button" id="standButton">Stand</button>
+        <button class="button" id="resetButton">Reset Game</button>
+    </div>
+
+    <script>
+        let playerHand = [];
+        let dealerHand = [];
+        let playerScore = 0;
+        let dealerScore = 0;
+
+        const playerCardsDiv = document.getElementById("playerCards");
+        const dealerCardsDiv = document.getElementById("dealerCards");
+        const messageDiv = document.getElementById("message");
+
+        function getCardValue(card) {
+            if (['J', 'Q', 'K'].includes(card)) return 10;
+            if (card === 'A') return 11;
+            return parseInt(card);
+        }
+
+        function updateScores() {
+            playerScore = playerHand.reduce((sum, card) => sum + getCardValue(card), 0);
+            dealerScore = dealerHand.reduce((sum, card) => sum + getCardValue(card), 0);
+        }
+
+        function updateGame() {
+            playerCardsDiv.innerHTML = "Player: " + playerHand.join(" ");
+            dealerCardsDiv.innerHTML = "Dealer: " + dealerHand.join(" ");
+            updateScores();
+            messageDiv.innerHTML = `Player: ${playerScore} | Dealer: ${dealerScore}`;
+
+            if (playerScore > 21) {
+                messageDiv.innerHTML = "You busted! Dealer wins!";
+            } else if (dealerScore > 21) {
+                messageDiv.innerHTML = "Dealer busted! You win!";
+            }
+        }
+
+        function resetGame() {
+            playerHand = [];
+            dealerHand = [];
+            updateGame();
+            messageDiv.innerHTML = "Your turn!";
+        }
+
+        document.getElementById("hitButton").addEventListener("click", () => {
+            // Add a card to player's hand and update game state
+            const card = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'][Math.floor(Math.random() * 13)];
+            playerHand.push(card);
+            updateGame();
+        });
+
+        document.getElementById("standButton").addEventListener("click", () => {
+            // Dealer's turn
+            while (dealerScore < 17) {
+                const card = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'][Math.floor(Math.random() * 13)];
+                dealerHand.push(card);
+                updateGame();
+            }
+            if (dealerScore > 21 || playerScore > dealerScore) {
+                messageDiv.innerHTML = "You win!";
+            } else if (playerScore < dealerScore) {
+                messageDiv.innerHTML = "Dealer wins!";
+            } else {
+                messageDiv.innerHTML = "It's a tie!";
+            }
+        });
+
+        document.getElementById("resetButton").addEventListener("click", resetGame);
+
+        // Start the game by resetting
+        resetGame();
+    </script>
+</body>
+</html>
